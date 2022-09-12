@@ -1,4 +1,4 @@
-        // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -24,7 +24,7 @@ contract Pool {
             amount >= 10 && amount <= 1000 ether,
             "Pool: Amount not in range"
         );
-        require(tokenAddress == address(stable), "Pool: Only stable");
+        require(tokenAddress == address(stable), "Pool: Only stable address");
         require(
             stable.balanceOf(msg.sender) >= amount,
             "Pool: Not enough balance"
@@ -34,15 +34,15 @@ contract Pool {
             "Pool: Not enough allowance"
         );
         stable.transferFrom(msg.sender, address(this), amount);
-        LpTokenAmount += amount / 10;
         lpToken.mint(msg.sender, amount / 10);
+        LpTokenAmount += amount / 10;
     }
 
     function withdraw(uint256 _amount) external {
         require(lpToken.balanceOf(msg.sender) > 0, "Pool: Dont have LpTokens");
         uint256 lpValueOfaGivenAmount = _amount / 10;
         require(
-            lpToken.balanceOf(msg.sender) - lpValueOfaGivenAmount >= 0,
+            lpToken.balanceOf(msg.sender) >= lpValueOfaGivenAmount,
             "Pool: Not enough LpTokens"
         );
         lpToken.burn(msg.sender, lpValueOfaGivenAmount);
@@ -98,7 +98,7 @@ contract Pool {
         address _tokenIn,
         address _tokenOut,
         address _router
-    ) private returns (uint256) {
+    ) public returns (uint256) {
         address[] memory tokens = new address[](2);
         tokens[0] = _tokenIn;
         tokens[1] = _tokenOut;
